@@ -8,6 +8,7 @@ import shutil
 app = Flask(__name__)
 app._static_folder = config.CONFIG['staticFolder']
 DOWNLOAD_FOLDER = config.CONFIG['downloadFolder']
+NEW_URL = config.CONFIG['newDownloadUrl']
 
 @app.route('/')
 def get_url():
@@ -19,5 +20,5 @@ def result():
 		text = request.form['text']	
 		file = wget.download(text)
 		shutil.move(DOWNLOAD_FOLDER + "/" + file, "/var/www/html/" + file)
-		output = "you can download the file from this url: localhost/" + file
+		output = "you can download the file from this url: " + NEW_URL + file
 		return render_template("result.html", output=output)
