@@ -25,7 +25,7 @@ def result():
 		file = wget.download(text)
 		check_file = Path(NEW_FOLDER+file)
 		if check_file.is_file():
-			output = "you can download the file from this url: " + NEW_URL + file
+			output = "this file exists from before and you can download the file from this url: " + NEW_URL + file
 			os.remove(file)
 		else:
 			shutil.move(DOWNLOAD_FOLDER + "/" + file, NEW_FOLDER + file)
