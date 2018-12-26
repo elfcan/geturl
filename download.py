@@ -18,17 +18,20 @@ NEW_FOLDER = config.CONFIG['newDownloadFolder']
 def get_url():
     return render_template('get_url.html')
 
-@app.route("/", methods=['GET', 'POST'])
-def result():	
+@app.route("/result", methods=['GET', 'POST'])
+def result():
+	fileExists = False
 	if request.method == 'POST':
-		text = request.form['text']	
+		text = request.form['text']
 		file = wget.download(text)
 		check_file = Path(NEW_FOLDER+file)
 		if check_file.is_file():
-			output = "this file exists from before and you can download the file from this url: " + NEW_URL + file
+			fileExists = True
 			os.remove(file)
 		else:
 			shutil.move(DOWNLOAD_FOLDER + "/" + file, NEW_FOLDER + file)
-			output = "you can download the file from this url: " + NEW_URL + file
-		
-		return render_template("result.html", output=output)
+		output = NEW_URL + file
+		return render_template("result.html", output=output, fileExists=fileExists)
+
+if __name__ == '__main__':
+    app.run()

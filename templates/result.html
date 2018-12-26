@@ -27,7 +27,11 @@
       <div class="jumbotron">
         <h1>Result</h1>
         <p>Here is the url to download the file: </p>
-        <p><b>{{output}}</b></p>
+        {% if fileExists == True %}
+          <p>This file existed from before, here is the url: <a href="{{output}}">{{output}}</a></p>
+        {% else %}
+          <p>New url is created: <a href="{{output}}">{{output}}</a></p>
+        {% endif %}
           <br>
           <a class="btn btn-lg btn-primary" href="/" role="button">Go Back</a>
       </div>

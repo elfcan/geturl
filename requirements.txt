@@ -1,2 +1,5 @@
 Flask==1.0.2
 wget==3.2
+setuptools==40.6.3
+pathlib=1.0.1
+pyopenssl==18.0.0
