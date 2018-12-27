@@ -25,8 +25,10 @@
 
       <!-- Main component for a primary marketing message or call to action -->
       <div class="jumbotron">
-        <h1>Here are files:</h1>
-        <p>{{files}}</p>
+        <h1>Files you downloaded before:</h1>
+        {% for url in url_list %}
+        <a href={{url}}>{{url}}</a></p>
+        {% endfor %}
           <br>
           <h1>Get Download URL</h1>
           <p>Enter the URL of the file you want to download: </p>
@@ -34,8 +36,10 @@
           <form action = "/new_url" method="POST">
             <input name="text" type="url" placeholder="https://example.com" required >
             <input type="submit">
-            <a class="btn btn-lg btn-primary" href="/" role="button">Go Back</a>
           </form>
+          <br>
+          <a class="btn btn-lg btn-primary" href="/" role="button">Go Back</a>
+
       </div>
 
     </div> <!-- /container -->

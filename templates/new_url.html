@@ -25,13 +25,8 @@
 
       <!-- Main component for a primary marketing message or call to action -->
       <div class="jumbotron">
-        <h1>Result</h1>
-        <p>Here is the url to download the file: </p>
-        {% if fileExists == True %}
-          <p>This file existed from before, here is the url: <a href="{{output}}">{{output}}</a></p>
-        {% else %}
-          <p>New url is created: <a href="{{output}}">{{output}}</a></p>
-        {% endif %}
+        <h1>Here is the url: </h1>
+          <p> <a href="{{output}}">{{output}}</a></p>
           <br>
           <a class="btn btn-lg btn-primary" href="/" role="button">Go Back</a>
       </div>
@@ -39,3 +34,13 @@
     </div> <!-- /container -->
   </body>
 </html>
+
+
+
+<!--         <p>Here is the url to download the file: </p>
+        {% if fileExists == True %}
+          <p>This file existed from before, here is the url: <a href="{{output}}">{{output}}</a></p>
+        {% else %}
+          <p>New url is created: <a href="{{output}}">{{output}}</a></p>
+        {% endif %}
+ -->
