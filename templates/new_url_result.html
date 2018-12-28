@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
-    <title>File List</title>
+    <title>Get Download URL</title>
     <!-- Bootstrap core CSS -->
     <link href="static/css/bootstrap.min.css" rel="stylesheet">
   </head>
@@ -18,33 +18,29 @@
       <nav class="navbar navbar-dark bg-dark">
         <div class="container-fluid">
           <div class="navbar-header">
-            <a class="navbar-brand" href="/">File List</a>
+            <a class="navbar-brand" href="/">Get Download URL</a>
           </div>
         </div><!--/.container-fluid -->
       </nav>
 
       <!-- Main component for a primary marketing message or call to action -->
       <div class="jumbotron">
-        <h1>Files you downloaded before:</h1>
-        {% for url in url_list %}
-        <a href={{url}}>{{url}}</a></p>
-        {% endfor %}
-          <br>
-          <h1>Get Download URL</h1>
-          <p>Enter the URL of the file you want to download: </p>
-          <br>
-          <form action = "/new_url" method="POST">
-            <input name="text" type="url" placeholder="https://example.com" required >
-            <p>Check below if you want to zip the file</p>
-            <input type="checkbox" name="zip" value="Zip"> Zip <br>
-            <br>
-            <input type="submit">
-          </form>
+        <h1>Here is the url: </h1>
+          <p> <a href="{{output}}">{{output}}</a></p>
           <br>
           <a class="btn btn-md btn-primary" href="/" role="button">Go Back</a>
-
       </div>
 
     </div> <!-- /container -->
   </body>
 </html>
+
+
+
+<!--         <p>Here is the url to download the file: </p>
+        {% if fileExists == True %}
+          <p>This file existed from before, here is the url: <a href="{{output}}">{{output}}</a></p>
+        {% else %}
+          <p>New url is created: <a href="{{output}}">{{output}}</a></p>
+        {% endif %}
+ -->

@@ -5,6 +5,7 @@ import wget
 import shutil
 from pathlib import Path
 import subprocess
+import zipfile 
 
 app = Flask(__name__)
 app._static_folder = config.CONFIG['staticFolder']
@@ -52,6 +53,10 @@ def new_url_result():
 		text = request.form['text']
 		global file
 		file = wget.download(text)
+		if request.form.getlist('zip') == [u'Zip']:
+			zipfile.ZipFile(file +'.zip', mode='w').write(file)
+			os.remove(file)
+			file = file + ".zip"
 		check_file = Path(NEW_FOLDER + username + "/" + file)
 		if check_file.is_file():
 			fileExists = True
@@ -59,7 +64,7 @@ def new_url_result():
 		else:
 			shutil.move(DOWNLOAD_FOLDER + "/" + file, NEW_FOLDER + username + "/" + file)
 		output = NEW_URL + username + "/" + file
-		return render_template("new_url.html", output=output, fileExists=fileExists, username=username)
+		return render_template("new_url_result.html", output=output)
 
 @app.route("/reload", methods=['GET', 'POST'])
 def reload():
@@ -72,7 +77,11 @@ def reload():
 			os.remove(str(check_file))
 			shutil.move(DOWNLOAD_FOLDER + "/" + file, NEW_FOLDER + username + "/" + file)
 		output = NEW_URL + username + "/" + file
-		return render_template("new_url.html", output=output, fileExists=fileExists, username=username)
+		return render_template("new_url_result.html", output=output)
+
+
+if __name__ == '__main__':
+	app.run()
 
 
 
