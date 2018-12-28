@@ -28,10 +28,19 @@
 
 	  <div class="jumbotron">
 		<h1>Get Download URL</h1>
-		<p>Enter the URL of the file you want to download: </p>
-		<form action = "/result" method="POST">
-				<input name="text" type="url" placeholder="https://example.com" required >
-				<input type="submit">
+		<p>This file exists from before. Do you want to reload the file?  </p>
+<!--         <form action = "/reload" method="POST">
+        	<input name="text" type="text" placeholder="please write 'yes' or 'no'" required >
+            <input type="submit">
+            <a class="btn btn-lg btn-primary" href="/" role="button">Go Back</a>
+        </form>
+ -->
+		<form action="/reload" method="POST">
+			<input type="checkbox" name="yes" value="Yes"> Yes<br>
+			<br>
+			<input type="checkbox" name="no" value="No"> No<br>
+			<br>
+			<input type="submit">
 		</form>
 	  </div>
 	</div> 
