@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request
+from flask import Flask, render_template, redirect, url_for, request, session
 import os
 import config
 import wget 
@@ -14,38 +14,22 @@ DOWNLOAD_FOLDER = config.CONFIG['downloadFolder']
 NEW_URL = config.CONFIG['newDownloadUrl']
 
 
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     error = None
-#     if request.method == 'POST':
-#         if request.form['username'] != 'admin' or request.form['password'] != 'admin':
-#             error = 'Invalid Credentials. Please try again.'
-#         else:
-#             return redirect(url_for('home'))
-#     return render_template('login.html', error=error)
-
 @app.route('/')
 def get_url():
-    return render_template('login.html')
+   if not session.get('logged_in'):
+      return render_template('login.html')
+   else:
+      return new_url()
 
-@app.route("/result", methods=['GET', 'POST'])
-def result():
-	# error = None
-	url_list = []
+@app.route("/new_url", methods=['GET', 'POST'])
+def new_url():
 	if request.method == 'POST':
 		global username
 		username = request.form['username']
-		directory = NEW_FOLDER + username
-		if not os.path.isdir(directory):
-			os.mkdir(directory)
-		files = os.listdir(directory)
-		for file in files:
-			url = NEW_URL + username + "/" + file
-			url_list.append(url)
-	return render_template('result.html', files=files, url_list=url_list)
+		session['logged_in'] = True
+	return render_template("new_url.html")
 
-
-@app.route("/new_url", methods=['GET', 'POST'])
+@app.route("/new_url_result", methods=['GET', 'POST'])
 def new_url_result():
 	global fileExists
 	fileExists = False
@@ -79,34 +63,28 @@ def reload():
 		output = NEW_URL + username + "/" + file
 		return render_template("new_url_result.html", output=output)
 
+@app.route("/result", methods=['GET', 'POST'])
+def result():
+	# error = None
+	url_list = []
+	# if request.method == 'POST':
+	# 	global username
+	# 	username = request.form['username']
+	# 	session['logged_in'] = True
+	directory = NEW_FOLDER + username
+	if not os.path.isdir(directory):
+		os.mkdir(directory)
+	files = os.listdir(directory)
+	for file in files:
+		url = NEW_URL + username + "/" + file
+		url_list.append(url)
+	return render_template('result.html', url_list=url_list)
+
+@app.route("/logout")
+def logout():
+   session['logged_in'] = False
+   return get_url()
 
 if __name__ == '__main__':
-	app.run()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		# password = request.form['password']
-
-		# if username != 'admin' or password != 'admin':
-		# 	error = 'Invalid Credentials. Please try again.'
-		# else:
-		# 	return "Hello World"
-	# return render_template('login.html', error=error)
+	app.secret_key = os.urandom(12)
+	app.run(debug=True,host='0.0.0.0', port=4000)
