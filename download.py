@@ -36,6 +36,8 @@ def new_url_result():
 	if request.method == 'POST':
 		text = request.form['text']
 		global file
+		working_directory = os.getcwd()
+		os.chdir(DOWNLOAD_FOLDER)
 		file = wget.download(text)
 		if request.form.getlist('zip') == [u'Zip']:
 			zipfile.ZipFile(file +'.zip', mode='w').write(file)
@@ -49,6 +51,7 @@ def new_url_result():
 			shutil.move(DOWNLOAD_FOLDER + "/" + file, NEW_FOLDER + username + "/" + file)
 		output = NEW_URL + username + "/" + file
 		return render_template("new_url_result.html", output=output)
+		os.chdir(working_directory)
 
 @app.route("/reload", methods=['GET', 'POST'])
 def reload():
