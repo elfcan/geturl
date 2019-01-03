@@ -27,6 +27,11 @@ def new_url():
 		global username
 		username = request.form['username']
 		session['logged_in'] = True
+		global directory
+		directory = NEW_FOLDER + username
+		if not os.path.isdir(directory):
+			os.mkdir(directory)
+
 	return render_template("new_url.html")
 
 @app.route("/new_url_result", methods=['GET', 'POST'])
@@ -70,13 +75,6 @@ def reload():
 def result():
 	# error = None
 	url_list = []
-	# if request.method == 'POST':
-	# 	global username
-	# 	username = request.form['username']
-	# 	session['logged_in'] = True
-	directory = NEW_FOLDER + username
-	if not os.path.isdir(directory):
-		os.mkdir(directory)
 	files = os.listdir(directory)
 	for file in files:
 		url = NEW_URL + username + "/" + file
