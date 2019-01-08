@@ -63,11 +63,11 @@ def reload():
 	if request.method == 'POST':
 		check_file = Path(NEW_FOLDER + username + "/" + file)
 		# choice = request.form.getlist('no')
-		if request.form.getlist('no') == [u'No']:
-			os.remove(file)
-		elif request.form.getlist('yes') == [u'Yes']:
+		if request.form.getlist('yes') == [u'Yes']:
 			os.remove(str(check_file))
 			shutil.move(DOWNLOAD_FOLDER + "/" + file, NEW_FOLDER + username + "/" + file)
+		else:
+			os.remove(file)
 		output = NEW_URL + username + "/" + file
 		return render_template("new_url_result.html", output=output)
 
