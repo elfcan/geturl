@@ -31,9 +31,9 @@
 
 								<div class="form-group">
 									<label for="password">Password
-										<a href="forgot.html" class="float-right">
-											Forgot Password?
-										</a>
+										<!--<a href="forgot.html" class="float-right">-->
+											<!--Forgot Password?-->
+										<!--</a>-->
 									</label>
 									<input id="password" type="password" class="form-control" name="password" required data-eye>
 								    <div class="invalid-feedback">
@@ -57,7 +57,8 @@
 								{% if messages %}
 								<ul class=flashes>
 									{% for message in messages %}
-									<li>{{ message }}</li>
+									<br>
+									<mark><b>{{ message }}</b></mark>
 									{% endfor %}
 								</ul>
 								{% endif %}
@@ -79,6 +80,6 @@
 
 	<script src="static/js/jquery.min.js"></script>
 	<script src="static/bootstrap/js/bootstrap.min.js"></script>
-	<script src="static/js/my-login.js"></script>
+	<script src="static/js/elifcan.js"></script>
 </body>
 </html>

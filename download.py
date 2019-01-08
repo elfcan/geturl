@@ -22,6 +22,7 @@ app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
+
 class User(db.Model):
 	__tablename__ = "users"
 	id = db.Column(db.Integer, primary_key=True)
@@ -34,14 +35,15 @@ class User(db.Model):
 
 	def __repr__(self):
 		return '<Username %r>' % self.username
-		return '<Password %r>' % self.password
 
 	def is_correct_password(self, plaintext):
 		return bcrypt.check_password_hash(self.password, plaintext)
 
+
 @app.route('/register', methods=['GET'])
 def register():
 	return render_template('register.html')
+
 
 @app.route('/register', methods=['POST'])
 def register_post():
@@ -54,9 +56,11 @@ def register_post():
 		flash("you have successfully registered, please login")
 		return redirect(url_for('login'))
 
+
 @app.route('/login', methods=['GET'])
 def login():
 	return render_template("login.html")
+
 
 @app.route('/login', methods=['POST'])
 def login_post():
@@ -78,12 +82,14 @@ def login_post():
 		flash("wrong password")
 		return login()
 
+
 @app.route('/', methods=['GET'])
 def get_url():
 	if not session.get('logged_in'):
 		return redirect(url_for("login"))
 	else:
 		return redirect(url_for("new_url"))
+
 
 @app.route("/new_url", methods=['GET'])
 def new_url():
@@ -114,13 +120,16 @@ def new_url_post():
 	os.chdir(working_directory)
 	return redirect(url_for("new_url_result", output=output))
 
+
 @app.route("/new_url_result", methods=['GET'])
 def new_url_result():
 	return render_template("new_url_result.html", output=output)
 
+
 @app.route("/reload", methods=['GET'])
 def reload():
 	return render_template("reload_file.html")
+
 
 @app.route("/reload", methods=['POST'])
 def reload_post():
@@ -135,6 +144,7 @@ def reload_post():
 	output = NEW_URL + username + "/" + file
 	return redirect(url_for("new_url_result", output=output))
 
+
 @app.route("/result", methods=['GET', 'POST'])
 def result():
 	# error = None
@@ -145,10 +155,12 @@ def result():
 		url_list.append(url)
 	return render_template('result.html', url_list=url_list)
 
+
 @app.route("/logout")
 def logout():
 	session['logged_in'] = False
 	return get_url()
+
 
 if __name__ == '__main__':
 	app.secret_key = os.urandom(12)
