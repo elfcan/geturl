@@ -33,7 +33,7 @@
           <p>Enter the URL of the file you want to download: </p>
           <br>
           <form action = "/new_url" method="POST">
-            <input name="text" type="url" placeholder="https://example.com" required >
+            <input name="text" type="url" placeholder="https://example.com" pattern="https?://.+" title="Include http://" required >
             <p>Check below if you want to zip the file</p>
             <input type="checkbox" name="zip" value="Zip"> Zip <br>
             <br>

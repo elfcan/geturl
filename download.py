@@ -15,23 +15,28 @@ app._static_folder = config.CONFIG['staticFolder']
 NEW_FOLDER = config.CONFIG['newDownloadFolder']
 DOWNLOAD_FOLDER = config.CONFIG['downloadFolder']
 NEW_URL = config.CONFIG['newDownloadUrl']
-DB_URL = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user='geturl',pw='123qwe123',url='localhost:5432',db='geturl')
+POSTGRES_URL = config.CONFIG['postgresUrl']
+POSTGRES_USER = config.CONFIG['postgresUser']
+POSTGRES_PASS = config.CONFIG['postgresPass']
+POSTGRES_DB = config.CONFIG['postgresDb']
+DB_URL = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user=POSTGRES_USER,pw=POSTGRES_PASS,url=POSTGRES_URL,db=POSTGRES_DB)
 
 app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
 
-
 class User(db.Model):
 	__tablename__ = "users"
 	id = db.Column(db.Integer, primary_key=True)
 	username = db.Column(db.String(120), unique=True)
 	password = db.Column(db.String(120))
+	email = db.Column(db.String(120), unique=True)
 
-	def __init__(self, username, password):
+	def __init__(self, username, password, email):
 		self.username = username
 		self.password = bcrypt.generate_password_hash(password)
+		self.email = email
 
 	def __repr__(self):
 		return '<Username %r>' % self.username
@@ -49,12 +54,24 @@ def register():
 def register_post():
 	username = request.form['username']
 	password = request.form['password']
+	email = request.form['email']
 	if not db.session.query(User).filter(User.username == username).count():
-		user = User(username, password)
-		db.session.add(user)
-		db.session.commit()
-		flash("you have successfully registered, please login")
-		return redirect(url_for('login'))
+		if not db.session.query(User).filter(User.email == email).count():
+			user = User(username, password, email)
+			db.session.add(user)
+			db.session.commit()
+			flash("you have successfully registered, please login")
+			return redirect(url_for('login'))
+		else:
+			flash("This mail address already has an account")
+			return redirect(url_for('register'))
+	else:
+		if not db.session.query(User).filter(User.email == email).count():
+			flash("This username is taken")
+			return redirect(url_for('register'))
+		else:
+			flash("You already have an account")
+			return redirect(url_for('register'))
 
 
 @app.route('/login', methods=['GET'])
