@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
@@ -9,43 +9,56 @@
 	<title>Get Download URL</title>
 
 	<!-- Bootstrap core CSS -->
-    <link href="static/css/bootstrap.min.css" rel="stylesheet">
-    <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
-  </head>
+	<link href="static/css/bootstrap.min.css" rel="stylesheet">
+	<script src="https://code.jquery.com/jquery-3.1.1.slim.min.js"></script>
+</head>
 
-  <body>
+<body>
 
-	<div class="container">
+<div class="container">
 
-	  <!-- Static navbar -->
-	  <nav class="navbar navbar-dark bg-dark">
+	<!-- Static navbar -->
+	<nav class="navbar navbar-dark bg-dark">
 		<div class="container-fluid">
-		  <div class="navbar-header">
-			<a class="navbar-brand" href="/">Get Download URL</a>
-		  </div>
+			<div class="navbar-header">
+				<a class="navbar-brand" href="/">Get Download URL</a>
+			</div>
 		</div>
-	  </nav>
+	</nav>
 
-	  <div class="jumbotron">
+	<div class="jumbotron">
 		<h1>Get Download URL</h1>
 		<p>This file exists from before. Do you want to reload the file?  </p>
-<!--         <form action = "/reload" method="POST">
-        	<input name="text" type="text" placeholder="please write 'yes' or 'no'" required >
-            <input type="submit">
-            <a class="btn btn-lg btn-primary" href="/" role="button">Go Back</a>
-        </form>
- -->
+		<!--         <form action = "/reload" method="POST">
+                    <input name="text" type="text" placeholder="please write 'yes' or 'no'" required >
+                    <input type="submit">
+                    <a class="btn btn-lg btn-primary" href="/" role="button">Go Back</a>
+                </form>
+         -->
 		<form action="/reload" method="POST">
 			<input type="checkbox" name="yes" value="Yes"> Yes<br>
 			<br>
 			<!--<input type="checkbox" name="no" value="No"> No<br>-->
 			<br>
 			<input type="submit">
-            <br>
-		</form>
-	  </div>
-	  <a class="btn btn-md btn-primary" href="/logout" role="button">Logout</a>
+			{% with messages = get_flashed_messages() %}
+			{% if messages %}
+			<ul class=flashes>
+				{% for message in messages %}
+				<li>{{ message }}</li>
+				{% endfor %}
+			</ul>
+			{% endif %}
+			{% endwith %}
+			{% block body %}{% endblock %}
 
-	</div> 
-  </body>
+			<br>
+		</form>
+	</div>
+	<a class="btn btn-md btn-primary" href="/logout" role="button">Logout</a>
+
+</div>
+<script src="static/js/elifcan.js"></script>
+
+</body>
 </html>
