@@ -1,4 +1,5 @@
 from flask import Flask, render_template, redirect, url_for, request, session, flash
+from flask_mail import Mail, Message
 import os
 import config
 import wget
@@ -8,6 +9,7 @@ import subprocess
 import zipfile
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from itsdangerous import URLSafeTimedSerializer
 
 
 app = Flask(__name__)
@@ -15,16 +17,26 @@ app._static_folder = config.CONFIG['staticFolder']
 NEW_FOLDER = config.CONFIG['newDownloadFolder']
 DOWNLOAD_FOLDER = config.CONFIG['downloadFolder']
 NEW_URL = config.CONFIG['newDownloadUrl']
+
 POSTGRES_URL = config.CONFIG['postgresUrl']
 POSTGRES_USER = config.CONFIG['postgresUser']
 POSTGRES_PASS = config.CONFIG['postgresPass']
 POSTGRES_DB = config.CONFIG['postgresDb']
 DB_URL = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user=POSTGRES_USER,pw=POSTGRES_PASS,url=POSTGRES_URL,db=POSTGRES_DB)
-
 app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
+
+MAIL_SERVER = config.CONFIG['mailServer']
+MAIL_PORT = config.CONFIG['mailPort']
+MAIL_USERNAME = config.CONFIG['mailUsername']
+MAIL_PASSWORD = config.CONFIG['mailPassword']
+MAIL_USE_TLS = config.CONFIG['mailUseTls']
+MAIL_USE_SSL = config.CONFIG['mailUseSsl']
+MAIL_DEBUG = config.CONFIG['mailDebug']
+MAIL_SUPPRESS_SEND = config.CONFIG['mailSuppress']
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
+mail = Mail(app)
 
 class User(db.Model):
 	__tablename__ = "users"
@@ -98,6 +110,25 @@ def login_post():
 	else:
 		flash("wrong password")
 		return login()
+
+
+@app.route('/forgot', methods=['GET'])
+def forgot():
+	return render_template("forgot.html")
+
+
+@app.route('/forgot', methods=['POST'])
+def forgot_post():
+	email = request.form['email']
+	msg = Message('Hello', sender=MAIL_USERNAME, recipients=[str(email)])
+	msg.body = "Hello, if you forgot your password please click on the link: https://geturl.kodgemisi.com/reset"
+	mail.send(msg)
+	flash("Mail is sent to this address: "+ email)
+	return forgot()
+
+@app.route('/reset', methods=['GET'])
+def reset():
+	return render_template("reset.html")
 
 
 @app.route('/', methods=['GET'])
