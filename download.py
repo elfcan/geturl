@@ -10,6 +10,7 @@ import zipfile
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
 from itsdangerous import URLSafeTimedSerializer
+import smtplib, ssl
 
 
 app = Flask(__name__)
@@ -120,9 +121,15 @@ def forgot():
 @app.route('/forgot', methods=['POST'])
 def forgot_post():
 	email = request.form['email']
-	msg = Message('Hello', sender=MAIL_USERNAME, recipients=[str(email)])
-	msg.body = "Hello, if you forgot your password please click on the link: https://geturl.kodgemisi.com/reset"
-	mail.send(msg)
+	subject = "geturl forgot password mail"
+	text = "Hello, if you forgot your password click on the link: https://localhost:4000/reset"
+	message = """From: %s\nTo: %s\nSubject: %s\n\n%s
+	""" % (MAIL_USERNAME, ", ".join(email), subject, text)
+	smtpObj = smtplib.SMTP_SSL(MAIL_SERVER, MAIL_PORT)
+	smtpObj.ehlo()
+	smtpObj.login(MAIL_USERNAME, MAIL_PASSWORD)
+	smtpObj.sendmail(MAIL_USERNAME, email, message)
+	smtpObj.close()
 	flash("Mail is sent to this address: "+ email)
 	return forgot()
 

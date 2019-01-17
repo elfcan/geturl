@@ -11,7 +11,7 @@ CONFIG = {
 	'mailPort':'465',
 	'mailUsername':'smtp@kodgemisi.com',
 	'mailPassword':'k1o2d3gem1s1',
-	'mailUseTls':True,
+	'mailUseTls':False,
 	'mailUseSsl':True,
 	'mailSuppress':False,
 	'mailDebug':True
