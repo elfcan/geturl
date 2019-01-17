@@ -1,4 +1,5 @@
 from flask import Flask, render_template, redirect, url_for, request, session, flash
+from flask_mail import Mail, Message
 import os
 import config
 import wget
@@ -8,6 +9,8 @@ import subprocess
 import zipfile
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
+from itsdangerous import URLSafeTimedSerializer
+import smtplib, ssl
 
 
 app = Flask(__name__)
@@ -15,16 +18,26 @@ app._static_folder = config.CONFIG['staticFolder']
 NEW_FOLDER = config.CONFIG['newDownloadFolder']
 DOWNLOAD_FOLDER = config.CONFIG['downloadFolder']
 NEW_URL = config.CONFIG['newDownloadUrl']
+
 POSTGRES_URL = config.CONFIG['postgresUrl']
 POSTGRES_USER = config.CONFIG['postgresUser']
 POSTGRES_PASS = config.CONFIG['postgresPass']
 POSTGRES_DB = config.CONFIG['postgresDb']
 DB_URL = 'postgresql+psycopg2://{user}:{pw}@{url}/{db}'.format(user=POSTGRES_USER,pw=POSTGRES_PASS,url=POSTGRES_URL,db=POSTGRES_DB)
-
 app.config['SQLALCHEMY_DATABASE_URI'] = DB_URL
+
+MAIL_SERVER = config.CONFIG['mailServer']
+MAIL_PORT = config.CONFIG['mailPort']
+MAIL_USERNAME = config.CONFIG['mailUsername']
+MAIL_PASSWORD = config.CONFIG['mailPassword']
+MAIL_USE_TLS = config.CONFIG['mailUseTls']
+MAIL_USE_SSL = config.CONFIG['mailUseSsl']
+MAIL_DEBUG = config.CONFIG['mailDebug']
+MAIL_SUPPRESS_SEND = config.CONFIG['mailSuppress']
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
+mail = Mail(app)
 
 class User(db.Model):
 	__tablename__ = "users"
@@ -98,6 +111,64 @@ def login_post():
 	else:
 		flash("wrong password")
 		return login()
+
+
+@app.route('/forgot', methods=['GET'])
+def forgot():
+	return render_template("forgot.html")
+
+
+@app.route('/forgot', methods=['POST'])
+def forgot_post():
+	email = request.form['email']
+	if not db.session.query(User).filter(User.email == email).count():
+		flash("Mail is sent to this address if it's valid: "+ email)
+		return forgot()
+	else:
+		password_reset_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+		password_reset_url = url_for(
+			'reset',
+			token=password_reset_serializer.dumps(email, salt='password-reset-salt'),
+			_external=True)
+		subject = "geturl forgot password mail"
+		text = "Hello, if you forgot your password click on the link: " + password_reset_url
+		message = """From: %s\nTo: %s\nSubject: %s\n\n%s
+		""" % (MAIL_USERNAME, ", ".join(email), subject, text)
+		smtpObj = smtplib.SMTP_SSL(MAIL_SERVER, MAIL_PORT)
+		smtpObj.ehlo()
+		smtpObj.login(MAIL_USERNAME, MAIL_PASSWORD)
+		smtpObj.sendmail(MAIL_USERNAME, email, message)
+		smtpObj.close()
+		flash("Mail is sent to this address if it's valid: "+ email)
+		return forgot()
+
+@app.route('/reset', methods=['GET'])
+def reset():
+	if "token" not in request.args:
+		return redirect(url_for("login"))
+	try:
+		token = request.args['token']
+		password_reset_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+		email = password_reset_serializer.loads(token, salt='password-reset-salt', max_age=3600)
+	except:
+		flash("token is invalid")
+		return redirect(url_for("login"))
+
+
+	return render_template("reset.html", email=email)
+
+@app.route('/reset', methods =['POST'])
+def reset_post():
+	email = request.form['email']
+	password = request.form['password']
+	password = bcrypt.generate_password_hash(password)
+	user = User.query.filter_by(email=email).first()
+	user.email = email
+	user.password = password
+	db.session.commit()
+
+	flash("You have successfully changed your password")
+	return redirect(url_for("login"))
 
 
 @app.route('/', methods=['GET'])

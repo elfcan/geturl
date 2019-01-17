@@ -6,5 +6,13 @@ CONFIG = {
 	'postgresUrl':'localhost:5432',
 	'postgresUser':'geturl',
 	'postgresPass':'123qwe123',
-	'postgresDb':'geturl'
+	'postgresDb':'geturl',
+	'mailServer':'smtp.yandex.com',
+	'mailPort':'465',
+	'mailUsername':'geturl@kodgemisi.com',
+	'mailPassword':'jp6Y2e8dq1402Ek',
+	'mailUseTls':False,
+	'mailUseSsl':True,
+	'mailSuppress':False,
+	'mailDebug':True
 }
