@@ -121,21 +121,54 @@ def forgot():
 @app.route('/forgot', methods=['POST'])
 def forgot_post():
 	email = request.form['email']
-	subject = "geturl forgot password mail"
-	text = "Hello, if you forgot your password click on the link: https://localhost:4000/reset"
-	message = """From: %s\nTo: %s\nSubject: %s\n\n%s
-	""" % (MAIL_USERNAME, ", ".join(email), subject, text)
-	smtpObj = smtplib.SMTP_SSL(MAIL_SERVER, MAIL_PORT)
-	smtpObj.ehlo()
-	smtpObj.login(MAIL_USERNAME, MAIL_PASSWORD)
-	smtpObj.sendmail(MAIL_USERNAME, email, message)
-	smtpObj.close()
-	flash("Mail is sent to this address: "+ email)
-	return forgot()
+	if not db.session.query(User).filter(User.email == email).count():
+		flash("Mail is sent to this address if it's valid: "+ email)
+		return forgot()
+	else:
+		password_reset_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+		password_reset_url = url_for(
+			'reset',
+			token=password_reset_serializer.dumps(email, salt='password-reset-salt'),
+			_external=True)
+		subject = "geturl forgot password mail"
+		text = "Hello, if you forgot your password click on the link: " + password_reset_url
+		message = """From: %s\nTo: %s\nSubject: %s\n\n%s
+		""" % (MAIL_USERNAME, ", ".join(email), subject, text)
+		smtpObj = smtplib.SMTP_SSL(MAIL_SERVER, MAIL_PORT)
+		smtpObj.ehlo()
+		smtpObj.login(MAIL_USERNAME, MAIL_PASSWORD)
+		smtpObj.sendmail(MAIL_USERNAME, email, message)
+		smtpObj.close()
+		flash("Mail is sent to this address if it's valid: "+ email)
+		return forgot()
 
 @app.route('/reset', methods=['GET'])
 def reset():
-	return render_template("reset.html")
+	if "token" not in request.args:
+		return redirect(url_for("login"))
+	try:
+		token = request.args['token']
+		password_reset_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+		email = password_reset_serializer.loads(token, salt='password-reset-salt', max_age=3600)
+	except:
+		flash("token is invalid")
+		return redirect(url_for("login"))
+
+
+	return render_template("reset.html", email=email)
+
+@app.route('/reset', methods =['POST'])
+def reset_post():
+	email = request.form['email']
+	password = request.form['password']
+	password = bcrypt.generate_password_hash(password)
+	user = User.query.filter_by(email=email).first()
+	user.email = email
+	user.password = password
+	db.session.commit()
+
+	flash("You have successfully changed your password")
+	return redirect(url_for("login"))
 
 
 @app.route('/', methods=['GET'])
