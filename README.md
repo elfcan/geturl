@@ -6,7 +6,8 @@ It is an application that gives you a download url that you cannot download onsi
 
 Install requirements.
 ```bash
-pip install requirements.txt
+sudo su
+pip install -r requirements.txt
 ```
 
 ## Usage
@@ -14,8 +15,7 @@ pip install requirements.txt
 First, change constants on **config.py**.
 
 ```python
-export FLASK_APP=download.py
-flask run
+python download.py
 ```
 
 
