@@ -1,15 +1,14 @@
 from flask import Flask, render_template, redirect, url_for, request, session, flash
-from flask_mail import Mail, Message
+from flask_mail import Mail
 import os
 import config
 import wget
 import shutil
 from pathlib import Path
-import subprocess
 import zipfile
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-from itsdangerous import URLSafeTimedSerializer, Serializer
+from itsdangerous import URLSafeTimedSerializer
 import smtplib, ssl
 
 
@@ -70,9 +69,6 @@ def register_post():
 	email = request.form['email']
 	if not db.session.query(User).filter(User.username == username).count():
 		if not db.session.query(User).filter(User.email == email).count():
-			# user = User(username, password, email)
-			# db.session.add(user)
-			# db.session.commit()
 			register_url_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
 			register_url = url_for(
 				'register_validation',
