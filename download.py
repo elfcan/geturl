@@ -9,7 +9,7 @@ import subprocess
 import zipfile
 from flask_sqlalchemy import SQLAlchemy
 from flask_bcrypt import Bcrypt
-from itsdangerous import URLSafeTimedSerializer
+from itsdangerous import URLSafeTimedSerializer, Serializer
 import smtplib, ssl
 
 
@@ -70,11 +70,27 @@ def register_post():
 	email = request.form['email']
 	if not db.session.query(User).filter(User.username == username).count():
 		if not db.session.query(User).filter(User.email == email).count():
-			user = User(username, password, email)
-			db.session.add(user)
-			db.session.commit()
-			flash("You have successfully registered.")
-			return redirect(url_for('login'))
+			# user = User(username, password, email)
+			# db.session.add(user)
+			# db.session.commit()
+			register_url_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+			register_url = url_for(
+				'register_validation',
+				token=register_url_serializer.dumps(email, salt='password-reset-salt'),
+				username=register_url_serializer.dumps(username, salt='password-reset-salt'),
+				password=register_url_serializer.dumps(password, salt='password-reset-salt'),
+				_external=True)
+			subject = "GetUrl registration mail"
+			text = "Hello, to complete the registration please click on the link: " + register_url
+			message = """From: %s\nTo: %s\nSubject: %s\n\n%s
+			""" % (MAIL_USERNAME, ", ".join(email), subject, text)
+			smtpObj = smtplib.SMTP_SSL(MAIL_SERVER, MAIL_PORT)
+			smtpObj.ehlo()
+			smtpObj.login(MAIL_USERNAME, MAIL_PASSWORD)
+			smtpObj.sendmail(MAIL_USERNAME, email, message)
+			smtpObj.close()
+			flash("Please check your email and click on the link to complete registration.")
+			return redirect(url_for('register'))
 		else:
 			flash("This mail address already has an account.")
 			return redirect(url_for('register'))
@@ -85,6 +101,40 @@ def register_post():
 		else:
 			flash("You already have an account.")
 			return redirect(url_for('register'))
+
+@app.route('/register_validation', methods=['GET'])
+def register_validation():
+	if "token" not in request.args:
+		return redirect(url_for('register'))
+	try:
+		token = request.args['token']
+		username = request.args['username']
+		password = request.args['password']
+		register_serializer = URLSafeTimedSerializer(app.config['SECRET_KEY'])
+		email = register_serializer.loads(token, salt='password-reset-salt', max_age=3600)
+		username = register_serializer.loads(username, salt='password-reset-salt', max_age=3600)
+		password = register_serializer.loads(password, salt='password-reset-salt', max_age=3600)
+	except:
+		flash("token is invalid")
+		return redirect(url_for("register"))
+	return render_template('register_validation.html', email=email, username=username, password=password)
+
+
+@app.route('/register_validation', methods = ['POST'])
+def register_validation_post():
+	username = request.form['username']
+	password = request.form['password']
+	email = request.form['email']
+
+	if not db.session.query(User).filter(User.username == username).count():
+		user = User(username, password, email)
+		db.session.add(user)
+		db.session.commit()
+		flash("You have successfully registered.")
+		return redirect(url_for("login"))
+	else:
+		flash("You have already registered.")
+		return redirect(url_for("login"))
 
 
 @app.route('/login', methods=['GET'])
