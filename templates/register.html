@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	<meta name="author" content="Kodinger">
 	<meta name="viewport" content="width=device-width,initial-scale=1">
-	<title>My Login Page &mdash; Bootstrap 4 Login Page Snippet</title>
+	<title>Get Url</title>
 	<link rel="stylesheet" type="text/css" href="static/bootstrap/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="static/css/my-login.css">
 </head>
@@ -19,9 +19,19 @@
 					<div class="card fat">
 						<div class="card-body">
 							<h4 class="card-title">Register</h4>
+								{% with messages = get_flashed_messages() %}
+								{% if messages %}
+								<ul class=flashes>
+									{% for message in messages %}
+									<br>
+									<mark><b>{{ message }}</b></mark>
+									{% endfor %}
+								</ul>
+								{% endif %}
+								{% endwith %}
+								{% block body %}{% endblock %}
+
 							<form action = "/register" method="POST" class="my-login-validation" novalidate="">
-
-
 								<div class="form-group">
 									<label for="email">E-mail</label>
 									<input id ="email" name= "email" type="text" required pattern="[a-z0-9._%+-]+@[kodgemisi]+\.[com]{2,}$" class="form-control" required>
@@ -60,17 +70,6 @@
 										Register
 									</button>
 								</div>
-								{% with messages = get_flashed_messages() %}
-								{% if messages %}
-								<ul class=flashes>
-									{% for message in messages %}
-									<br>
-									<mark><b>{{ message }}</b></mark>
-									{% endfor %}
-								</ul>
-								{% endif %}
-								{% endwith %}
-								{% block body %}{% endblock %}
 								<div class="mt-4 text-center">
 									Already have an account? <a href="/">Login</a>
 								</div>
