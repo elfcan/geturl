@@ -19,6 +19,18 @@
 					<div class="card fat">
 						<div class="card-body">
 							<h4 class="card-title">Forgot Password</h4>
+							{% with messages = get_flashed_messages() %}
+							{% if messages %}
+							<ul class=flashes>
+								{% for message in messages %}
+								<br>
+								<mark><b>{{ message }}</b></mark>
+								{% endfor %}
+							</ul>
+							{% endif %}
+							{% endwith %}
+							{% block body %}{% endblock %}
+
 							<form method="POST" class="my-login-validation" novalidate="">
 								<div class="form-group">
 									<label for="email">E-Mail Address</label>
@@ -35,17 +47,6 @@
 									<button type="submit" class="btn btn-primary btn-block">
 										Reset Password
 									</button>
-									{% with messages = get_flashed_messages() %}
-									{% if messages %}
-									<ul class=flashes>
-										{% for message in messages %}
-										<br>
-										<mark><b>{{ message }}</b></mark>
-										{% endfor %}
-									</ul>
-									{% endif %}
-									{% endwith %}
-									{% block body %}{% endblock %}
 									<div class="mt-4 text-center">
 										 <a href="/">Go Back</a>
 									</div>

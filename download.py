@@ -73,17 +73,17 @@ def register_post():
 			user = User(username, password, email)
 			db.session.add(user)
 			db.session.commit()
-			flash("you have successfully registered, please login")
+			flash("You have successfully registered.")
 			return redirect(url_for('login'))
 		else:
-			flash("This mail address already has an account")
+			flash("This mail address already has an account.")
 			return redirect(url_for('register'))
 	else:
 		if not db.session.query(User).filter(User.email == email).count():
-			flash("This username is taken")
+			flash("This username is taken.")
 			return redirect(url_for('register'))
 		else:
-			flash("You already have an account")
+			flash("You already have an account.")
 			return redirect(url_for('register'))
 
 
@@ -99,7 +99,7 @@ def login_post():
 	password = request.form['password']
 	user = User.query.filter_by(username=username).first()
 	if user == None:
-		flash("you don't have an account please register")
+		flash("You don't have an account, please register.")
 		return login()
 	elif user.is_correct_password(password):
 		session['logged_in'] = True
@@ -109,7 +109,7 @@ def login_post():
 			os.mkdir(directory)
 		return redirect(url_for("new_url"))
 	else:
-		flash("wrong password")
+		flash("Wrong password.")
 		return login()
 
 
@@ -132,6 +132,7 @@ def forgot_post():
 			_external=True)
 		subject = "geturl forgot password mail"
 		text = "Hello, if you forgot your password click on the link: " + password_reset_url
+
 		message = """From: %s\nTo: %s\nSubject: %s\n\n%s
 		""" % (MAIL_USERNAME, ", ".join(email), subject, text)
 		smtpObj = smtplib.SMTP_SSL(MAIL_SERVER, MAIL_PORT)
@@ -167,7 +168,7 @@ def reset_post():
 	user.password = password
 	db.session.commit()
 
-	flash("You have successfully changed your password")
+	flash("You have successfully changed your password.")
 	return redirect(url_for("login"))
 
 

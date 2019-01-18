@@ -28,6 +28,18 @@
 
 	<div class="jumbotron">
 		<h1>Get Download URL</h1>
+			{% with messages = get_flashed_messages() %}
+			{% if messages %}
+			<ul class=flashes>
+				{% for message in messages %}
+				<li>{{ message }}</li>
+				{% endfor %}
+			</ul>
+			{% endif %}
+			{% endwith %}
+			{% block body %}{% endblock %}
+
+
 		<p>This file exists from before. Do you want to reload the file?  </p>
 		<!--         <form action = "/reload" method="POST">
                     <input name="text" type="text" placeholder="please write 'yes' or 'no'" required >
@@ -41,17 +53,6 @@
 			<!--<input type="checkbox" name="no" value="No"> No<br>-->
 			<br>
 			<input type="submit">
-			{% with messages = get_flashed_messages() %}
-			{% if messages %}
-			<ul class=flashes>
-				{% for message in messages %}
-				<li>{{ message }}</li>
-				{% endfor %}
-			</ul>
-			{% endif %}
-			{% endwith %}
-			{% block body %}{% endblock %}
-
 			<br>
 		</form>
 	</div>
